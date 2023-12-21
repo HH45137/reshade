@@ -1,6 +1,8 @@
 #pragma once
 #include <sl.h>
 #include <sl_dlss_g.h>
+#include <wrl/client.h>
+#include <dxgi.h>
 
 
 namespace DLSS {
@@ -38,6 +40,50 @@ namespace DLSS {
 			}
 
 			return 0;
+		}
+
+		static bool is_support_fg() {
+
+			Microsoft::WRL::ComPtr<IDXGIFactory> factory;
+			if (SUCCEEDED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&factory)))
+			{
+				Microsoft::WRL::ComPtr<IDXGIAdapter> adapter {};
+				uint32_t i = 0;
+				while (factory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND)
+				{
+					DXGI_ADAPTER_DESC desc {};
+					if (SUCCEEDED(adapter->GetDesc(&desc)))
+					{
+						sl::AdapterInfo adapterInfo {};
+						adapterInfo.deviceLUID = (uint8_t *)&desc.AdapterLuid;
+						adapterInfo.deviceLUIDSizeInBytes = sizeof(LUID);
+						if (SL_FAILED(result, slIsFeatureSupported(sl::kFeatureDLSS_G, adapterInfo)))
+						{
+							// Requested feature is not supported on the system, fallback to the default method
+							switch (result)
+							{
+							case sl::Result::eErrorOSOutOfDate:         // inform user to update OS
+								return false;
+							case sl::Result::eErrorDriverOutOfDate:     // inform user to update driver
+								return false;
+							case sl::Result::eErrorNoSupportedAdapterFound:  // cannot use this adapter (older or non-NVDA GPU etc)
+								return false;
+								// and so on ...
+							};
+
+							return false;
+						}
+						else
+						{
+							// Feature is supported on this adapter!
+							return true;
+						}
+					}
+					i++;
+				}
+			}
+
+			return false;
 		}
 
 	private:

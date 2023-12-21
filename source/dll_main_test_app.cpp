@@ -18,6 +18,8 @@
 #include <GL/gl3w.h>
 #include <vulkan/vulkan.h>
 
+#include "dlss/dlss.h"
+
 extern HMODULE g_module_handle;
 extern std::filesystem::path g_reshade_dll_path;
 extern std::filesystem::path g_reshade_base_path;
@@ -64,6 +66,8 @@ static LONG APIENTRY HookD3DKMTQueryAdapterInfo(const void *pData)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow)
 {
+	DLSS::DLSS3::init();
+
 	g_module_handle = hInstance;
 	g_reshade_dll_path = get_module_path(hInstance);
 	g_target_executable_path = g_reshade_dll_path;
@@ -131,7 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
 	MSG msg = {};
 
-	reshade::api::device_api api = reshade::api::device_api::d3d11;
+	reshade::api::device_api api = reshade::api::device_api::d3d12;
 	if (strstr(lpCmdLine, "-d3d9"))
 		api = reshade::api::device_api::d3d9;
 	if (strstr(lpCmdLine, "-d3d11"))
@@ -280,6 +284,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 					break;
 			HR_CHECK(hr);
 		}
+
+		DLSS::DLSS3::select_device(device.get());
+		bool isSupportFG = DLSS::DLSS3::is_support_fg();
 
 		// Check if this device was created using d3d12on7 on Windows 7
 		// See https://microsoft.github.io/DirectX-Specs/d3d/D3D12onWin7.html for more information
