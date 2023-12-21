@@ -31,6 +31,15 @@ namespace DLSS {
 			}
 		}
 
+		static int select_device(void *d3dDevice) {
+
+			if (SL_FAILED(res, slSetD3DDevice(d3dDevice))) {
+				return -1;
+			}
+
+			return 0;
+		}
+
 	private:
 
 	};
