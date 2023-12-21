@@ -79,6 +79,9 @@
     <Filter Include="resources\shaders">
       <UniqueIdentifier>{9232c43b-559d-4435-b309-c8bbf4e6477b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\dlss">
+      <UniqueIdentifier>{22bd517e-1511-4ea8-a38d-231c14446f75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="examples\09-depth\generic_depth.cpp">
@@ -697,6 +700,9 @@
     </ClInclude>
     <ClInclude Include="source\vulkan\vulkan_impl_type_convert.hpp">
       <Filter>core\runtime\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="source\dlss\dlss.h">
+      <Filter>core\dlss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

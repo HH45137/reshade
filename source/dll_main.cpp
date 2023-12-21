@@ -16,6 +16,8 @@
 static PVOID s_exception_handler_handle = nullptr;
 #endif
 
+#include "dlss/dlss.h"
+
 // Export special symbol to identify modules as ReShade instances
 extern "C" __declspec(dllexport) const char *ReShadeVersion = VERSION_STRING_PRODUCT;
 
@@ -122,6 +124,8 @@ std::filesystem::path get_module_path(HMODULE module)
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID)
 {
+	DLSS::DLSS3::init();
+
 	switch (fdwReason)
 	{
 		case DLL_PROCESS_ATTACH:
